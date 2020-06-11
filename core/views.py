@@ -5,10 +5,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, View
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.utils import timezone
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm
 from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile
+from twilio.twiml.messaging_response import MessagingResponse, Media, Message, Body
+from core import controller
+
+from django_twilio.decorators import twilio_view
+
+
 
 import random
 import string
@@ -515,3 +522,12 @@ class RequestRefundView(View):
             except ObjectDoesNotExist:
                 messages.info(self.request, "This order does not exist.")
                 return redirect("core:request-refund")
+
+@twilio_view
+def handle_bot_queries(request):
+    resp = MessagingResponse()
+    message = Message()
+    brain_response = controller.handle_whatsapp_user_input(request)
+    message.body(brain_response)
+    resp.append(message) 
+    return resp

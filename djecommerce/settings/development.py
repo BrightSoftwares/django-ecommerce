@@ -1,7 +1,7 @@
 from .base import *
 
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['aa4b74d715de.ngrok.io', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS += [
     'debug_toolbar'
@@ -45,3 +45,5 @@ DATABASES = {
 
 STRIPE_PUBLIC_KEY = ''
 STRIPE_SECRET_KEY = ''
+TWILIO_ACCOUNT_SID = ''
+TWILIO_AUTH_TOKEN = ''
