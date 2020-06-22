@@ -32,6 +32,9 @@ Pillow = "*"
 twilio = "*"
 django-twilio = "*"
 djangorestframework = "*"
+dj-database-url = "*"
+whitenoise = "*"
+django-heroku = "*"
 
 [requires]
 python_version = "3.8"

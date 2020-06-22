@@ -9,7 +9,8 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ('title', 'price', 'discount_price', 'label', 'slug', 'description', 'image')
+        fields = ('title', 'price', 'discount_price',
+                  'label', 'slug', 'description', 'image')
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -17,4 +18,5 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'shipping_address', 'billing_address', 'payment', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
+        fields = ('user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'shipping_address',
+                  'billing_address', 'payment', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
