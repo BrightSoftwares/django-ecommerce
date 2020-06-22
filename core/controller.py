@@ -12,7 +12,7 @@ def handle_whatsapp_user_input(request):
     user_id = request.POST.get('From', '')
 
     state_data = bot.get_data(user_id)
-    current_menu_position = state_data.get('current_menu_position')
+    current_menu_position =  bot.get_state(user_id=user_id) #state_data.get('current_menu_position')
 
     return state_to_action(current_menu_position, user_id, user_input)
 

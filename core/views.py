@@ -15,6 +15,9 @@ from core import controller
 
 from django_twilio.decorators import twilio_view
 
+from rest_framework import viewsets
+
+from .serializers import OrderSerializer, ItemSerializer
 
 
 import random
@@ -523,11 +526,22 @@ class RequestRefundView(View):
                 messages.info(self.request, "This order does not exist.")
                 return redirect("core:request-refund")
 
+
 @twilio_view
 def handle_bot_queries(request):
     resp = MessagingResponse()
     message = Message()
     brain_response = controller.handle_whatsapp_user_input(request)
     message.body(brain_response)
-    resp.append(message) 
+    resp.append(message)
     return resp
+
+
+class OrderView(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
+class ItemView(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer

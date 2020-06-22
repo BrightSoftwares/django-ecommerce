@@ -10,6 +10,7 @@ from fsm.storage.base import BaseStorage, DisabledStorage
 
 class WhatsAppBot():
     def __init__(self, token, storage=DisabledStorage(), threaded=True, skip_pending=False, num_threads=2):
+        print("Init bot")
         assert issubclass(storage.__class__, BaseStorage)
         self.storage = storage
         # super(WhatsAppBot, self).__init__(token, threaded=threaded, skip_pending=skip_pending, num_threads=num_threads)

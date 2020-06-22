@@ -1,4 +1,6 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
+
 from .views import (
     ItemDetailView,
     CheckoutView,
@@ -10,10 +12,16 @@ from .views import (
     PaymentView,
     AddCouponView,
     RequestRefundView,
-    handle_bot_queries
+    handle_bot_queries,
+    ItemView,
+    OrderView
 )
 
 app_name = 'core'
+
+router = routers.DefaultRouter()
+router.register('orders', OrderView)
+router.register('items', ItemView)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -27,5 +35,8 @@ urlpatterns = [
          name='remove-single-item-from-cart'),
     path('payment/<payment_option>/', PaymentView.as_view(), name='payment'),
     path('request-refund/', RequestRefundView.as_view(), name='request-refund'),
-    path('bot/', handle_bot_queries, name='bot')
+    path('bot/', handle_bot_queries, name='bot'),
+    path('api/', include(router.urls), name='apiindex'),
+    path('api/orders/', OrderView, name='orders'),
+    path('api/items/', ItemView, name='items'),
 ]

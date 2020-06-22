@@ -10,6 +10,7 @@ class MemoryStorage(BaseStorage):
     Memory storage. Not recommended for production due to losing states after restart.
     """
     def __init__(self):
+        print("Init memory storage")
         self.data = {}
 
     def _get_chat(self, chat_id):
