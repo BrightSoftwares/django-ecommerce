@@ -35,6 +35,7 @@ djangorestframework = "*"
 dj-database-url = "*"
 whitenoise = "*"
 django-heroku = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
