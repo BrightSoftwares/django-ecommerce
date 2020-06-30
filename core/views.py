@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, View
 from django.views.decorators.csrf import csrf_exempt
@@ -19,6 +20,7 @@ from rest_framework import viewsets
 
 from .serializers import OrderSerializer, ItemSerializer
 
+from core.tasks import pull_vinted_products
 
 import random
 import string
@@ -473,6 +475,11 @@ def get_coupon(request, code):
     except ObjectDoesNotExist:
         messages.info(request, "This coupon does not exist")
         return redirect("core:checkout")
+
+
+def update_from_vinted(request):
+    pull_vinted_products.delay()
+    return HttpResponse("<h1>Task added {}</h1>".format(timezone.now()))
 
 
 class AddCouponView(View):

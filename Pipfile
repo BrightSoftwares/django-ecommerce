@@ -36,6 +36,9 @@ dj-database-url = "*"
 whitenoise = "*"
 django-heroku = "*"
 gunicorn = "*"
+celery = "==4.4.2"
+redis = "*"
+django-celery = "*"
 
 [requires]
 python_version = "3.8"

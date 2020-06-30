@@ -14,7 +14,8 @@ from .views import (
     RequestRefundView,
     handle_bot_queries,
     ItemView,
-    OrderView
+    OrderView,
+    update_from_vinted
 )
 
 app_name = 'core'
@@ -39,4 +40,6 @@ urlpatterns = [
     path('api/', include(router.urls), name='apiindex'),
     path('api/orders/', OrderView, name='orders'),
     path('api/items/', ItemView, name='items'),
+    path('automation/update-from-vinted/',
+         update_from_vinted, name='update-from-vinted'),
 ]

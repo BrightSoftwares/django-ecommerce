@@ -62,6 +62,9 @@ class Item(models.Model):
             'slug': self.slug
         })
 
+    class Meta:
+        ordering = ['-id']
+
 
 class OrderItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
