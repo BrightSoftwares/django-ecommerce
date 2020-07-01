@@ -38,7 +38,10 @@ django-heroku = "*"
 gunicorn = "*"
 redis = "*"
 django-celery = "*"
-celery = "*"
+celery = "==4.4.6"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
