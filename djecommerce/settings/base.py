@@ -1,5 +1,6 @@
 import os
 from decouple import config
+import djcelery
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -94,3 +95,5 @@ CELERY_CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
 VINTED_LOGIN = config('VINTED_LOGIN')
 VINTED_PASSWORD = config('VINTED_PASSWORD')
+
+djcelery.setup_loader()
