@@ -1,9 +1,9 @@
-amqp==2.6.0
+amqp==1.4.9
 anyjson==0.3.3
 astroid==2.4.2
 autopep8==1.4.4
 Babel==2.8.0
-billiard==3.6.3.0
+billiard==3.3.0.23
 celery==4.4.6
 certifi==2019.3.9
 chardet==3.0.4
@@ -23,7 +23,7 @@ future==0.18.2
 gunicorn==20.0.4
 idna==2.8
 isort==4.3.21
-kombu==4.6.11
+kombu==3.0.37
 lazy-object-proxy==1.4.3
 mccabe==0.6.1
 oauthlib==3.0.1
