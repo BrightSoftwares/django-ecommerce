@@ -47,13 +47,13 @@ class Vinted():
     def login(self):
         '''login to vinted using the credentials in creds'''
 
-        print("Login with creds", self.creds)
+        # print("Login with creds", self.creds)
         self.sess = requests.session()
         login_url = 'https://www.vinted.fr/member/general/login?ref_url='
 
         print('Login to url', login_url)
         tt = self.sess.get(login_url).content.decode('utf-8')
-        # print('Login result', tt)
+        print('Login result', tt)
 
         pp = re.compile('name="csrf-token" content="(.*?)"')
         mm = pp.search(tt)
