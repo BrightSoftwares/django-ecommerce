@@ -1,6 +1,6 @@
 import os
 from decouple import config
-import djcelery
+# import djcelery
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -28,7 +28,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'djcelery'
+    # 'djcelery'
 ]
 
 MIDDLEWARE = [
@@ -91,9 +91,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+# CELERY_CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
 VINTED_LOGIN = config('VINTED_LOGIN')
 VINTED_PASSWORD = config('VINTED_PASSWORD')
 
-djcelery.setup_loader()
+# djcelery.setup_loader()
