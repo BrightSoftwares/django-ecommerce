@@ -18,7 +18,7 @@ from django_twilio.decorators import twilio_view
 
 from rest_framework import viewsets
 
-from .serializers import OrderSerializer, ItemSerializer
+from .serializers import OrderSerializer, ItemSerializer, AddressSerializer, CouponSerializer, OrderItemSerializer, UserProfileSerializer
 
 from core.tasks import pull_vinted_products
 
@@ -552,3 +552,23 @@ class OrderView(viewsets.ModelViewSet):
 class ItemView(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+
+
+class AddressView(viewsets.ModelViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+
+
+class CouponView(viewsets.ModelViewSet):
+    queryset = Coupon.objects.all()
+    serializer_class = CouponSerializer
+
+
+class OrderItemView(viewsets.ModelViewSet):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+
+
+class UserProfileView(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer

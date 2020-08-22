@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'core',
 
     'rest_framework',
+    'rest_framework.authtoken',
 
     # 'djcelery'
 ]
@@ -58,6 +59,15 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
 
 WSGI_APPLICATION = 'djecommerce.wsgi.application'
 

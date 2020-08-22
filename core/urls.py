@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
+from rest_framework.authtoken import views
 
 from .views import (
     ItemDetailView,
@@ -15,6 +16,10 @@ from .views import (
     handle_bot_queries,
     ItemView,
     OrderView,
+    AddressView,
+    CouponView,
+    OrderItemView,
+    UserProfileView,
     update_from_vinted
 )
 
@@ -23,6 +28,10 @@ app_name = 'core'
 router = routers.DefaultRouter()
 router.register('orders', OrderView)
 router.register('items', ItemView)
+router.register('address', AddressView)
+router.register('coupon', CouponView)
+router.register('orderitem', OrderItemView)
+router.register('userprofile', UserProfileView)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -38,8 +47,13 @@ urlpatterns = [
     path('request-refund/', RequestRefundView.as_view(), name='request-refund'),
     path('bot/', handle_bot_queries, name='bot'),
     path('api/', include(router.urls), name='apiindex'),
+    path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
     path('api/orders/', OrderView, name='orders'),
     path('api/items/', ItemView, name='items'),
+    path('api/address/', AddressView, name='address'),
+    path('api/coupon/', CouponView, name='coupon'),
+    path('api/orderitem/', OrderItemView, name='orderitem'),
+    path('api/userprofile/', UserProfileView, name='userprofile'),
     path('automation/update-from-vinted/',
          update_from_vinted, name='update-from-vinted'),
 ]
