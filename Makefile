@@ -83,7 +83,7 @@ deploy: ## Push the zip file to the remote server.
 startdev: ## Start the development server using nodemon watcher
 	@echo "Starting $(OK_COLOR)nodemon$(NO_COLOR) process to ease development"
 	#@nodemon vocabulary_bot.py
-	docker run -it --rm -v $PWD:/app -p 8002:8002  fullbright/python3.6.11-buster /bin/bash
+	docker run -it --rm -v ${PWD}:/app -p 8002:8002  fullbright/python3.6.11-buster pipenv run python manage.py runserver 0.0.0.0:8002
 
 requirements.txt: Pipfile
 	pip freeze > requirements.txt
