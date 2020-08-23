@@ -16,7 +16,7 @@ from core import controller
 
 from django_twilio.decorators import twilio_view
 
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -33,29 +33,29 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 """
 Customer journey : 
 
-> Search a product
-    > Sub searches
-    > Update search terms
-> Add product to the cart
-    > Update quantity
-    > Update color
-    > Update size
-    > Delete product from cart
-> View cart
-> Checkout
-    > Add address (billing and/or shipping)
-    > Remove address
-    > Update address
-    > Choose address
-> Shipment
-    > Choose shipment
-    > Update shipment
-> Pay
-    > Choose payment method
-    > Pay
-> View order
-    > Cancel order
-    > View order status
++> Search a product OK
+    +> Sub searches
+    +> Update search terms
+-> Add product to the cart OK
+    -> Update quantity
+    -> Update color
+    -> Update size
+    -> Delete product from cart
+    -> View cart
+-> Checkout OK
+    -> Add address (billing and/or shipping)
+    -> Remove address
+    -> Update address
+    -> Choose address
+-> Shipment (to create) TODO
+    -> Choose shipment
+    -> Update shipment
+-> Pay (to create) TODO
+    -> Choose payment method
+    -> Pay
+-> View order
+    -> Cancel order
+    -> View order status
 
 """
 
@@ -586,6 +586,11 @@ class OrderView(viewsets.ModelViewSet):
 class ItemView(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['title', 'price', 'category',
+                     'description', 'slug', 'label']
+    ordering_fields = ['price', 'category']
+    ordering = ['price']
 
 
 class AddressView(viewsets.ModelViewSet):

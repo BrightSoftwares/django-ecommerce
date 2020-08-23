@@ -9,17 +9,8 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ('title', 'price', 'discount_price',
+        fields = ('id', 'title', 'price', 'discount_price', 'category',
                   'label', 'slug', 'description', 'image')
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    # plates = PlateSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Order
-        fields = ('user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'shipping_address',
-                  'billing_address', 'payment', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -27,7 +18,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('user', 'one_click_purchasing')
+        fields = ('id', 'user', 'one_click_purchasing')
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -35,7 +26,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ('user', 'ordered', 'item', 'quantity')
+        fields = ('id', 'user', 'ordered', 'item', 'quantity')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    # plates = PlateSerializer(many=True, read_only=True)
+    items = OrderItemSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ('id', 'user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'shipping_address',
+                  'billing_address', 'payment', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -43,7 +44,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Address
-        fields = ('user', 'street_address', 'country',
+        fields = ('id', 'user', 'street_address', 'country',
                   'apartment_address', 'zip', 'address_type', 'default')
 
 

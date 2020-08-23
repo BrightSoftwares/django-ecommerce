@@ -47,7 +47,7 @@ class Item(models.Model):
     image = models.ImageField()
 
     def __str__(self):
-        return self.title
+        return "{} {}€ {}".format(self.title, self.price, self.label)
 
     def get_absolute_url(self):
         return reverse("core:product", kwargs={
@@ -76,7 +76,7 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=1)
 
     def __str__(self):
-        return f"{self.quantity} of {self.item.title}"
+        return f"Product: {self.item.title}, Qty: {self.quantity} for {self.user.username}"
 
     def get_total_item_price(self):
         return self.quantity * self.item.price
@@ -126,7 +126,7 @@ class Order(models.Model):
     '''
 
     def __str__(self):
-        return self.user.username
+        return f"Order for {self.user.username} with {self.items.length} items, Ordered: {self.ordered}"
 
     def get_total(self):
         total = 0
@@ -148,7 +148,7 @@ class Address(models.Model):
     default = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.address_type} address (default? {self.default}): {self.user.username}, {self.street_address}, {self.apartment_address}, {self.country}"
 
     class Meta:
         verbose_name_plural = 'Addresses'
@@ -162,7 +162,7 @@ class Payment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} - {self.amount}€"
 
 
 class Coupon(models.Model):
@@ -170,7 +170,7 @@ class Coupon(models.Model):
     amount = models.FloatField()
 
     def __str__(self):
-        return self.code
+        return f"{self.code} - {self.amount}"
 
 
 class Refund(models.Model):
@@ -180,7 +180,7 @@ class Refund(models.Model):
     email = models.EmailField()
 
     def __str__(self):
-        return f"{self.pk}"
+        return f"Refund accepted: {self.accepted} : {self.pk}, Reason: {self.reason}"
 
 
 def userprofile_receiver(sender, instance, created, *args, **kwargs):
