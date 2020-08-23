@@ -17,6 +17,8 @@ from core import controller
 from django_twilio.decorators import twilio_view
 
 from rest_framework import viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .serializers import OrderSerializer, ItemSerializer, AddressSerializer, CouponSerializer, OrderItemSerializer, UserProfileSerializer
 
@@ -26,6 +28,36 @@ import random
 import string
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+"""
+Customer journey : 
+
+> Search a product
+    > Sub searches
+    > Update search terms
+> Add product to the cart
+    > Update quantity
+    > Update color
+    > Update size
+    > Delete product from cart
+> View cart
+> Checkout
+    > Add address (billing and/or shipping)
+    > Remove address
+    > Update address
+    > Choose address
+> Shipment
+    > Choose shipment
+    > Update shipment
+> Pay
+    > Choose payment method
+    > Pay
+> View order
+    > Cancel order
+    > View order status
+
+"""
 
 
 def create_ref_code():
@@ -380,6 +412,7 @@ class ItemDetailView(DetailView):
 
 
 @login_required
+@permission_classes((IsAuthenticated,))
 def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_item, created = OrderItem.objects.get_or_create(
@@ -549,6 +582,7 @@ class OrderView(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 
 
+@permission_classes((AllowAny, ))
 class ItemView(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer

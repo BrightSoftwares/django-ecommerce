@@ -5,19 +5,21 @@ from django.db.models import Sum
 from django.shortcuts import reverse
 from django_countries.fields import CountryField
 
-
+# TODO : Make this an object
 CATEGORY_CHOICES = (
     ('S', 'Shirt'),
     ('SW', 'Sport wear'),
     ('OW', 'Outwear')
 )
 
+# TODO : Make this an object
 LABEL_CHOICES = (
     ('P', 'primary'),
     ('S', 'secondary'),
     ('D', 'danger')
 )
 
+# TODO : Make this an object
 ADDRESS_CHOICES = (
     ('B', 'Billing'),
     ('S', 'Shipping'),
