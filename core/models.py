@@ -19,12 +19,6 @@ LABEL_CHOICES = (
     ('D', 'danger')
 )
 
-# TODO : Make this an object
-ADDRESS_CHOICES = (
-    ('B', 'Billing'),
-    ('S', 'Shipping'),
-)
-
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
@@ -36,12 +30,34 @@ class UserProfile(models.Model):
         return self.user.username
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=256)
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Label(models.Model):
+    name = models.CharField(max_length=256)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Item(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    # category = models.ForeignKey(
+    #     Category, on_delete=models.CASCADE, blank=False, null=False)
     label = models.CharField(choices=LABEL_CHOICES, max_length=1)
+    # label = models.ForeignKey(
+    #     Label, on_delete=models.CASCADE, blank=False, null=False)
     slug = models.SlugField()
     description = models.TextField()
     image = models.ImageField()
@@ -126,7 +142,8 @@ class Order(models.Model):
     '''
 
     def __str__(self):
-        return f"Order for {self.user.username} with {self.items.length} items, Ordered: {self.ordered}"
+        nbitems = self.items.length if self.items is None else 0
+        return f"Order for {self.user.username} with {nbitems} items, Ordered: {self.ordered}"
 
     def get_total(self):
         total = 0
@@ -135,6 +152,12 @@ class Order(models.Model):
         if self.coupon:
             total -= self.coupon.amount
         return total
+
+
+ADDRESS_CHOICES = (
+    ('B', 'Billing'),
+    ('S', 'Shipping'),
+)
 
 
 class Address(models.Model):
