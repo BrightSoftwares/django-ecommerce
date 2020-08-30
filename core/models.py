@@ -6,18 +6,18 @@ from django.shortcuts import reverse
 from django_countries.fields import CountryField
 
 # TODO : Make this an object
-CATEGORY_CHOICES = (
-    ('S', 'Shirt'),
-    ('SW', 'Sport wear'),
-    ('OW', 'Outwear')
-)
+# CATEGORY_CHOICES = (
+#     ('S', 'Shirt'),
+#     ('SW', 'Sport wear'),
+#     ('OW', 'Outwear')
+# )
 
 # TODO : Make this an object
-LABEL_CHOICES = (
-    ('P', 'primary'),
-    ('S', 'secondary'),
-    ('D', 'danger')
-)
+# LABEL_CHOICES = (
+#     ('P', 'primary'),
+#     ('S', 'secondary'),
+#     ('D', 'danger')
+# )
 
 
 class UserProfile(models.Model):
@@ -52,12 +52,12 @@ class Item(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
     discount_price = models.FloatField(blank=True, null=True)
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
-    # category = models.ForeignKey(
-    #     Category, on_delete=models.CASCADE, blank=False, null=False)
-    label = models.CharField(choices=LABEL_CHOICES, max_length=1)
-    # label = models.ForeignKey(
-    #     Label, on_delete=models.CASCADE, blank=False, null=False)
+    # category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=False, null=False)
+    # label = models.CharField(choices=LABEL_CHOICES, max_length=1)
+    label = models.ForeignKey(
+        Label, on_delete=models.CASCADE, blank=False, null=False)
     slug = models.SlugField()
     description = models.TextField()
     image = models.ImageField()
