@@ -587,9 +587,9 @@ class ItemView(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'price', 'category',
-                     'description', 'slug', 'label']
-    ordering_fields = ['price', 'category']
+    search_fields = ['title', 'price', 'category__name',
+                     'description', 'slug', 'label__name']
+    ordering_fields = ['price', 'category__name']
     ordering = ['price']
 
 
