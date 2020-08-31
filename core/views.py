@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.utils import timezone
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm
-from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile
+from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile, Category, Label
 from twilio.twiml.messaging_response import MessagingResponse, Media, Message, Body
 from core import controller
 
@@ -20,7 +20,7 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializers import OrderSerializer, ItemSerializer, AddressSerializer, CouponSerializer, OrderItemSerializer, UserProfileSerializer
+from .serializers import OrderSerializer, ItemSerializer, AddressSerializer, CouponSerializer, OrderItemSerializer, UserProfileSerializer, CategorySerializer, LabelSerializer
 
 from core.tasks import pull_vinted_products
 
@@ -621,3 +621,13 @@ class OrderItemView(viewsets.ModelViewSet):
 class UserProfileView(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+
+
+class CategoryView(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class LabelView(viewsets.ModelViewSet):
+    queryset = Label.objects.all()
+    serializer_class = LabelSerializer

@@ -20,7 +20,9 @@ from .views import (
     CouponView,
     OrderItemView,
     UserProfileView,
-    update_from_vinted
+    update_from_vinted,
+    CategoryView,
+    LabelView
 )
 
 app_name = 'core'
@@ -32,6 +34,8 @@ router.register('address', AddressView)
 router.register('coupon', CouponView)
 router.register('orderitem', OrderItemView)
 router.register('userprofile', UserProfileView)
+router.register('category', CategoryView)
+router.register('label', LabelView)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -52,6 +56,8 @@ urlpatterns = [
     path('api/items/', ItemView, name='items'),
     path('api/address/', AddressView, name='address'),
     path('api/coupon/', CouponView, name='coupon'),
+    path('api/category/', CategoryView, name='category'),
+    path('api/label/', LabelView, name='label'),
     path('api/orderitem/', OrderItemView, name='orderitem'),
     path('api/userprofile/', UserProfileView, name='userprofile'),
     path('automation/update-from-vinted/',

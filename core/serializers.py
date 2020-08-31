@@ -1,16 +1,43 @@
 from rest_framework import serializers
 
-from .models import Item, Order, UserProfile, Coupon, Address, OrderItem
+from .models import Item, Order, UserProfile, Coupon, Address, OrderItem, Category, Label
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name')
+
+
+class LabelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Label
+        fields = ('id', 'name')
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    # owner_name = serializers.CharField(read_only=True, source="owner.name")
-    # owner_surname = serializers.CharField(read_only=True, source="owner.surname")
+    category = CategorySerializer()
+    label = LabelSerializer()
 
     class Meta:
         model = Item
-        fields = ('id', 'title', 'price', 'discount_price', 'category', 'category__name',
+        fields = ('id', 'title', 'price', 'discount_price', 'category',
                   'label', 'slug', 'description', 'image')
+
+    def create(self, validated_data):
+        category_data = validated_data.pop('category')
+        label_data = validated_data.pop('label')
+        print("Category data", category_data)
+        print("Label data", label_data)
+        category, _ = Category.objects.get_or_create(**category_data)
+        label, _ = Label.objects.get_or_create(**label_data)
+
+        album = Item.objects.create(
+            **validated_data, category=category, label=label)
+
+        return album
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
