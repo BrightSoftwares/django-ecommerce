@@ -58,6 +58,7 @@ class Item(models.Model):
     slug = models.SlugField()
     description = models.TextField()
     image = models.ImageField()
+    stock_quantity = models.IntegerField(default=1)
 
     def __str__(self):
         return "{} {}€ {}".format(self.title, self.price, self.label)
