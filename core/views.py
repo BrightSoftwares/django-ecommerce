@@ -36,27 +36,37 @@ Customer journey :
 +> Search a product OK
     +> Sub searches
     +> Update search terms
--> Add product to the cart OK
-    -> Update quantity
-    -> Update color
-    -> Update size
-    -> Delete product from cart
-    -> View cart
--> Checkout OK
-    -> Add address (billing and/or shipping)
-    -> Remove address
-    -> Update address
-    -> Choose address
--> Shipment (to create) TODO
-    -> Choose shipment
-    -> Update shipment
--> Pay (to create) TODO
-    -> Choose payment method
-    -> Pay
--> View order
-    -> Cancel order
-    -> View order status
+-> Add product to the cart
+    -> Update quantity : give user's ID, item ID and quantity
+    -> Update color : give user id, item id that has the new color
+    -> Update size : give user id, item id that has the new size
+    -> Delete product from cart : user id and product id
 
+-> Address management OK
+    -> Add address (billing and/or shipping)
+    -> Remove address : user's ID, address details and the type of address billing or shipping
+    -> Update address : user's ID, address details and the type of address ID
+    -> Choose address : order's ID, address ID
+
+-> Shipment (to create) TODO
+    -> Choose shipment : order ID, shipment ID
+    -> Update shipment : order ID, new shipment ID
+
+-> Checkout / Pay (to create) TODO
+    -> Choose payment method
+    -> Get the link where to pay
+    -> Pay
+-> View order / -> View cart TODO
+    -> Return only the non paid order
+    -> Return only the order that belong to the user with the ID specified
+    -> OrderItems : 
+        - Show the order items of the current order alone
+        - Show the order item of the user with the speficied ID
+-> Cancel order TODO
+    - Means set the ordered to false + delete all the order items attached to that order (empty the cart)
+
+-> View order status TODO
+    - Get the details of the order that is not paid yet
 """
 
 
@@ -587,7 +597,7 @@ class ItemView(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'price', 'category__name',
+    search_fields = ['title', '=price', 'category__name',
                      'description', 'slug', 'label__name']
     ordering_fields = ['price', 'category__name']
     ordering = ['price']
