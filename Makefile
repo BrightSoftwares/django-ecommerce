@@ -96,7 +96,7 @@ docker-test: ## Run tests in a docker container
 	docker run --rm --env SLEEP_DURATION=30 -v $(MEDIAPATH):/home/fullbright/fr-replay-downloader/youtube -v $(LOGSPATH):/home/fullbright/fr-replay-downloader/logs -v $(CODEPATH)/tests/settings.yaml:/home/fullbright/fr-replay-downloader/settings.yaml  fullbright/replay-downloader
 	
 docker-debug: ## Run the application in a docker container in debug mode
-	docker run -it --rm --env SLEEP_DURATION=30 -v $(MEDIAPATH):/home/fullbright/fr-replay-downloader/youtube -v $(LOGSPATH):/home/fullbright/fr-replay-downloader/logs -v $(CODEPATH)/tests/settings.yaml:/home/fullbright/fr-replay-downloader/settings.yaml  fullbright/replay-downloader /bin/bash
+	docker run -it --rm -v ${PWD}:/app fullbright/python3.6.11-buster /bin/bash
 
 docker-build: ## Build the application in a docker container
 	docker build -t fullbright/replay-downloader .
