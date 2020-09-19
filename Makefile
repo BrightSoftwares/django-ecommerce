@@ -14,6 +14,7 @@ NO_COLOR    = \033[m
 
 APP_VERSION = $(shell date +"%Y%m%d%H%M")
 APP_NAME = "mynto.io_bot"
+HEROKU_APP_NAME = "whatsappecommerce"
 LATEST_RELEASE = $(shell ls -tp -w 1 *zip | head --lines=1)
 
 
@@ -104,4 +105,8 @@ docker-build: ## Build the application in a docker container
 docker-run: ## Run the application in a docker container
 	docker run -it --env SLEEP_DURATION=30 -v $(MEDIAPATH):/home/fullbright/fr-replay-downloader/youtube -v $(LOGSPATH):/home/fullbright/fr-replay-downloader/logs fullbright/replay-downloader
 
-
+heroku-migrate-db:
+	@echo "Migrating data in the db of the application $(OK_COLOR) ${HEROKU_APP_NAME} $(NO_COLOR)"
+	heroku run --app ${HEROKU_APP_NAME} python manage.py makemigrations
+	sleep 3
+	heroku run --app ${HEROKU_APP_NAME} python manage.py migrate
