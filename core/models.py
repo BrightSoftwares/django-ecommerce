@@ -4,16 +4,26 @@ from django.db import models
 from django.db.models import Sum
 from django.shortcuts import reverse
 from django_countries.fields import CountryField
+from django.utils import timezone
 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+        settings.AUTH_USER_MODEL, related_name='profile', on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=50, blank=True, null=True)
     one_click_purchasing = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
+
+    def get_current_order(self, create=False):
+        current_order = Order.objects.filter(
+            user=self.user).filter(ordered=False).first()
+
+        if current_order is None and create is True:
+            current_order = Order(user=self.user, ordered_date=timezone.now())
+            current_order.save()
+        return current_order
 
 
 class Category(models.Model):
@@ -83,7 +93,7 @@ class Item(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="orders",
                              on_delete=models.CASCADE)
     ref_code = models.CharField(max_length=20, blank=True, null=True)
     # items = models.ManyToManyField(OrderItem)
@@ -163,7 +173,7 @@ ADDRESS_CHOICES = (
 
 
 class Address(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="addresses",
                              on_delete=models.CASCADE)
     street_address = models.CharField(max_length=100)
     apartment_address = models.CharField(max_length=100)

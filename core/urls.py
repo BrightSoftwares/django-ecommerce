@@ -22,7 +22,9 @@ from .views import (
     UserProfileView,
     update_from_vinted,
     CategoryView,
-    LabelView
+    LabelView,
+    ChooseShipmentView,
+    choose_order_shipment
 )
 
 app_name = 'core'
@@ -36,6 +38,7 @@ router.register('orderitem', OrderItemView)
 router.register('userprofile', UserProfileView)
 router.register('category', CategoryView)
 router.register('label', LabelView)
+# router.register('shipment', choose_order_shipment)
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -60,6 +63,9 @@ urlpatterns = [
     path('api/label/', LabelView, name='label'),
     path('api/orderitem/', OrderItemView, name='orderitem'),
     path('api/userprofile/', UserProfileView, name='userprofile'),
+    path('api/add-to-cart/<slug>/', add_to_cart, name='api-add-to-cart'),
+    path('api/choose-shipment/', choose_order_shipment,
+         name='api-choose-shipment'),
     path('automation/update-from-vinted/',
          update_from_vinted, name='update-from-vinted'),
 ]

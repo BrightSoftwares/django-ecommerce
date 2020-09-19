@@ -17,10 +17,16 @@ from core import controller
 from django_twilio.decorators import twilio_view
 
 from rest_framework import viewsets, filters
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.schemas import AutoSchema
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import authentication, permissions
 
-from .serializers import OrderSerializer, ItemSerializer, AddressSerializer, CouponSerializer, OrderItemSerializer, UserProfileSerializer, CategorySerializer, LabelSerializer
+from .serializers import (OrderSerializer, ItemSerializer, AddressSerializer, CouponSerializer,
+                          OrderItemSerializer, UserProfileSerializer, CategorySerializer, LabelSerializer,
+                          UserSerializer)
 
 from core.tasks import pull_vinted_products
 
@@ -31,11 +37,12 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 """
-Customer journey : 
+Customer journey :
 
 +> Search a product OK
     +> Sub searches
     +> Update search terms
+
 -> Add product to the cart
     -> Update quantity : give user's ID, item ID and quantity
     -> Update color : give user id, item id that has the new color
@@ -56,12 +63,14 @@ Customer journey :
     -> Choose payment method
     -> Get the link where to pay
     -> Pay
+
 -> View order / -> View cart TODO
     -> Return only the non paid order
     -> Return only the order that belong to the user with the ID specified
-    -> OrderItems : 
+    -> OrderItems :
         - Show the order items of the current order alone
         - Show the order item of the user with the speficied ID
+
 -> Cancel order TODO
     - Means set the ordered to false + delete all the order items attached to that order (empty the cart)
 
@@ -631,3 +640,48 @@ class CategoryView(viewsets.ModelViewSet):
 class LabelView(viewsets.ModelViewSet):
     queryset = Label.objects.all()
     serializer_class = LabelSerializer
+
+
+class ChooseShipmentView(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+
+    def get(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        print("query set", self.queryset)
+        usernames = [user.user.username for user in UserProfile.objects.all()]
+        return Response(usernames)
+
+
+@api_view(['POST'])
+@schema(AutoSchema)
+def choose_order_shipment(request):
+
+    # Get the request data and extract the values
+    print("Post request data: {}".format(request.data))
+    username = request.data['username']
+    address_id = request.data['address_id']
+    print("Username : {}, address id {}".format(username, address_id))
+
+    user = UserProfile.objects.filter(user__username=username).first()
+    shipment = Address.objects.filter(id=address_id).first()
+
+    if user is not None and shipment is not None:
+        current_order = user.get_current_order(create=True)
+        print("Got current order : {}".format(current_order))
+        print("Shipment address: {}".format(shipment))
+
+        current_order.shipping_address = shipment
+        current_order.save()
+        return Response({"message": "Shipment address updated"})
+
+        # if request.method == 'POST':
+        #     return Response({"message": "Got some data!", "data": request.data})
+        # return Response({"message": "Hello, world!"})
+    elif user is None:
+        return Response({"message": "Cannot find user with username {}".format(username)})
+    elif shipment is None:
+        return Response({"message": "Cannot find shipment with id {}".format(address_id)})
+    else:
+        return Response({"message": "Unknwon error"})

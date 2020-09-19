@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
+
 
 from .models import Item, Order, UserProfile, Coupon, Address, OrderItem, Category, Label
 
@@ -40,30 +42,12 @@ class ItemSerializer(serializers.ModelSerializer):
         return album
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    # plates = PlateSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = UserProfile
-        fields = ('id', 'user', 'one_click_purchasing')
-
-
 class OrderItemSerializer(serializers.ModelSerializer):
     # plates = PlateSerializer(many=True, read_only=True)
 
     class Meta:
         model = OrderItem
         fields = ('id', 'user', 'ordered', 'item', 'quantity', 'order')
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    # plates = PlateSerializer(many=True, read_only=True)
-    items = OrderItemSerializer(many=True)
-
-    class Meta:
-        model = Order
-        fields = ('id', 'user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'shipping_address',
-                  'billing_address', 'payment', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -75,9 +59,40 @@ class AddressSerializer(serializers.ModelSerializer):
                   'apartment_address', 'zip', 'address_type', 'default')
 
 
+class OrderSerializer(serializers.ModelSerializer):
+    # plates = PlateSerializer(many=True, read_only=True)
+    items = OrderItemSerializer(many=True)
+    shipping_address = AddressSerializer()
+    billing_address = AddressSerializer()
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Order
+        fields = ('id', 'user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'shipping_address',
+                  'billing_address', 'payment', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
+
+
 class CouponSerializer(serializers.ModelSerializer):
     # plates = PlateSerializer(many=True, read_only=True)
 
     class Meta:
         model = Coupon
         fields = ('id', 'code')
+
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+    # serializers.StringRelatedField(many=True)
+    addresses = AddressSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'profile', 'addresses']
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = UserProfile
+        fields = ('id', 'user', 'one_click_purchasing')
