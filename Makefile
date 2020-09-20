@@ -107,6 +107,7 @@ docker-run: ## Run the application in a docker container
 
 heroku-migrate-db:
 	@echo "Migrating data in the db of the application $(OK_COLOR) ${HEROKU_APP_NAME} $(NO_COLOR)"
-	heroku run --app ${HEROKU_APP_NAME} python manage.py makemigrations
-	sleep 3
-	heroku run --app ${HEROKU_APP_NAME} python manage.py migrate
+	heroku run --app ${HEROKU_APP_NAME} /bin/sh -c "python manage.py makemigrations && sleep 3 && python manage.py migrate"
+	#heroku run --app ${HEROKU_APP_NAME} python manage.py makemigrations
+	#sleep 3
+	#heroku run --app ${HEROKU_APP_NAME} python manage.py migrate
