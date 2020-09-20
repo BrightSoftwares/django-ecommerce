@@ -105,6 +105,11 @@ docker-build: ## Build the application in a docker container
 docker-run: ## Run the application in a docker container
 	docker run -it --env SLEEP_DURATION=30 -v $(MEDIAPATH):/home/fullbright/fr-replay-downloader/youtube -v $(LOGSPATH):/home/fullbright/fr-replay-downloader/logs fullbright/replay-downloader
 
+
+local-migrate-db:
+	@echo "Migrating data in the db of the $(OK_COLOR) local dev $(NO_COLOR)"
+	docker run -it --rm -v ${PWD}:/app -p 8002:8002  fullbright/python3.6.11-buster /bin/sh -c "pipenv run python manage.py makemigrations && sleep 3 && pipenv run python manage.py migrate"
+
 heroku-migrate-db:
 	@echo "Migrating data in the db of the application $(OK_COLOR) ${HEROKU_APP_NAME} $(NO_COLOR)"
 	heroku run --app ${HEROKU_APP_NAME} /bin/sh -c "python manage.py makemigrations && sleep 3 && python manage.py migrate"
