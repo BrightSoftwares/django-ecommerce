@@ -1,3 +1,4 @@
+from enum import Enum
 from django.db.models.signals import post_save
 from django.conf import settings
 from django.db import models
@@ -152,7 +153,8 @@ class Order(models.Model):
     def get_waitingforpayment_payment(self, create=True):
         print('Get the current payment waiting to be paid')
 
-        payment_qs = Payment.objects.filter(order=self).filter(status='N')
+        payment_qs = Payment.objects.filter(
+            order=self).filter(status=PaymentStatus.N.name)
 
         if not payment_qs.exists() and create is True:
             payment = Payment(user=self.user, amount=self.amount, order=self)
@@ -190,10 +192,14 @@ class OrderItem(models.Model):
         return self.get_total_item_price()
 
 
-ADDRESS_CHOICES = (
-    ('B', 'Billing'),
-    ('S', 'Shipping'),
-)
+# ADDRESS_CHOICES = (
+#     ('B', 'Billing'),
+#     ('S', 'Shipping'),
+# )
+
+class AddressType(Enum):
+    B = "Billing"
+    S = "Shipping"
 
 
 class Address(models.Model):
@@ -203,7 +209,8 @@ class Address(models.Model):
     apartment_address = models.CharField(max_length=100)
     country = CountryField(multiple=False)
     zip = models.CharField(max_length=100)
-    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
+    address_type = models.CharField(max_length=1, choices=[(
+        tag.name, tag.value) for tag in AddressType], default=AddressType.S.name)
     default = models.BooleanField(default=False)
 
     def __str__(self):
@@ -213,11 +220,16 @@ class Address(models.Model):
         verbose_name_plural = 'Addresses'
 
 
-PAYMENT_STATUS = (
-    ('N', 'New, waiting for payment'),
-    ('P', 'Paid'),
-    ('F', 'Payment failed'),
-)
+# PAYMENT_STATUS = (
+#     ('N', 'New, waiting for payment'),
+#     ('P', 'Paid'),
+#     ('F', 'Payment failed'),
+# )
+
+class PaymentStatus(Enum):
+    N = "New, waiting for payment"
+    P = "Paid"
+    F = "Payment failed"
 
 
 class PaymentType(models.Model):
@@ -239,7 +251,7 @@ class Payment(models.Model):
     payment_type = models.ForeignKey(
         PaymentType, on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(
-        max_length=1, choices=PAYMENT_STATUS, default='N')
+        max_length=1, choices=[(tag.name, tag.value) for tag in PaymentStatus], default=PaymentStatus.N.name)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
