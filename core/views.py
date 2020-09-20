@@ -3,14 +3,14 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, View
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.utils import timezone
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm
-from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile, Category, Label
+from .models import Item, OrderItem, Order, Address, Payment, PaymentType, Coupon, Refund, UserProfile, Category, Label
 from twilio.twiml.messaging_response import MessagingResponse, Media, Message, Body
 from core import controller
 
@@ -26,7 +26,7 @@ from rest_framework import authentication, permissions
 
 from .serializers import (OrderSerializer, ItemSerializer, AddressSerializer, CouponSerializer,
                           OrderItemSerializer, UserProfileSerializer, CategorySerializer, LabelSerializer,
-                          UserSerializer)
+                          UserSerializer, PaymentSerializer, PaymentTypeSerializer)
 
 from core.tasks import pull_vinted_products
 
@@ -55,26 +55,26 @@ Customer journey :
     -> Update address : user's ID, address details and the type of address ID
     -> Choose address : order's ID, address ID
 
--> Shipment (to create) TODO
+-> Shipment (to create) OK
     -> Choose shipment : order ID, shipment ID
     -> Update shipment : order ID, new shipment ID
 
 -> Checkout / Pay (to create) TODO
-    -> Choose payment method
-    -> Get the link where to pay
-    -> Pay
+    -> Choose payment method OK
+    -> Get the link where to pay OK
+    -> Pay TODO
 
--> View order / -> View cart TODO
-    -> Return only the non paid order
-    -> Return only the order that belong to the user with the ID specified
+-> View order / -> View cart OK 
+    -> Return only the non paid order (see view order status) OK
+    -> Return only the order that belong to the user with the ID specified OK
     -> OrderItems :
-        - Show the order items of the current order alone
-        - Show the order item of the user with the speficied ID
+        - Show the order items of the current order alone OK
+        - Show the order item of the user with the speficied ID OK (see Return only the order that belong to the user with the ID specified)
 
--> Cancel order TODO
+-> Cancel order OK
     - Means set the ordered to false + delete all the order items attached to that order (empty the cart)
 
--> View order status TODO
+-> View order status OK
     - Get the details of the order that is not paid yet
 """
 
@@ -617,6 +617,16 @@ class AddressView(viewsets.ModelViewSet):
     serializer_class = AddressSerializer
 
 
+class PaymentApiView(viewsets.ModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+
+class PaymentTypeView(viewsets.ModelViewSet):
+    queryset = PaymentType.objects.all()
+    serializer_class = PaymentTypeSerializer
+
+
 class CouponView(viewsets.ModelViewSet):
     queryset = Coupon.objects.all()
     serializer_class = CouponSerializer
@@ -683,5 +693,63 @@ def choose_order_shipment(request):
         return Response({"message": "Cannot find user with username {}".format(username)})
     elif shipment is None:
         return Response({"message": "Cannot find shipment with id {}".format(address_id)})
+    else:
+        return Response({"message": "Unknwon error"})
+
+
+@api_view(['POST'])
+def cancel_order(request, id):
+    print('Getting the order with the ID {}'.format(id))
+
+    order = get_object_or_404(Order, id=id)
+    order.cancel()
+
+    return Response({"message": "Order with ID {} cancelled".format(order.id)})
+
+
+@api_view(['GET'])
+def get_userprofile_current_order(request, id):
+    print("Get the user profile")
+    user = get_object_or_404(UserProfile, id=id)
+    current_order = user.get_current_order()
+    print("Got current order {}".format(current_order))
+
+    serializer = OrderSerializer(current_order, many=False)
+
+    return JsonResponse(serializer.data, status=200)
+
+
+@api_view(['POST'])
+@schema(AutoSchema)
+def choose_order_paymentmethod(request):
+
+    # Get the request data and extract the values
+    print("Post request data: {}".format(request.data))
+    username = request.data['username']
+    payment_method_id = request.data['payment_method']
+    print("Username : {}, payment method {}".format(username, payment_method_id))
+
+    user = UserProfile.objects.filter(user__username=username).first()
+    payment_type = PaymentType.objects.filter(id=payment_method_id).first()
+
+    if user is not None and payment_type is not None:
+        current_order = user.get_current_order(create=True)
+        print("Got current order : {}".format(current_order))
+        print("Payment method: {}".format(payment_method_id))
+
+        current_payment = current_order.get_waitingforpayment_payment(
+            create=False)
+        if current_payment is None:
+            current_payment = Payment(user=current_order.user, amount=current_order.get_total(
+            ), order=current_order, payment_type=payment_type)
+        else:
+            current_payment.payment_type = payment_type
+
+        current_payment.save()
+        return Response({"message": "Payment method updated to {}".format(payment_type)})
+    elif user is None:
+        return Response({"message": "Cannot find user with username {}".format(username)})
+    elif payment_type is None:
+        return Response({"message": "Cannot find payment method with id {}".format(payment_method_id)})
     else:
         return Response({"message": "Unknwon error"})

@@ -18,7 +18,7 @@ class UserProfile(models.Model):
 
     def get_current_order(self, create=False):
         current_order = Order.objects.filter(
-            user=self.user).filter(ordered=False).first()
+            user=self.user).filter(ordered=False).filter(cancelled=False).first()
 
         if current_order is None and create is True:
             current_order = Order(user=self.user, ordered_date=timezone.now())
@@ -104,8 +104,8 @@ class Order(models.Model):
         'Address', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey(
         'Address', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
-    payment = models.ForeignKey(
-        'Payment', on_delete=models.SET_NULL, blank=True, null=True)
+    # payment = models.ForeignKey(
+    #     'Payment', on_delete=models.SET_NULL, blank=True, null=True)
     coupon = models.ForeignKey(
         'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
     shipping_method = models.ForeignKey(
@@ -114,6 +114,7 @@ class Order(models.Model):
     received = models.BooleanField(default=False)
     refund_requested = models.BooleanField(default=False)
     refund_granted = models.BooleanField(default=False)
+    cancelled = models.BooleanField(default=False)
 
     '''
     1. Item added to cart
@@ -137,6 +138,29 @@ class Order(models.Model):
         if self.coupon:
             total -= self.coupon.amount
         return total
+
+    def cancel(self):
+        print("Cancelling order with id {}".format(self.id))
+
+        if self.ordered is True:
+            raise Exception(
+                "Cannot cancel an ordered (paid) order. Use the refund system instead")
+        else:
+            self.cancelled = True
+            self.save()
+
+    def get_waitingforpayment_payment(self, create=True):
+        print('Get the current payment waiting to be paid')
+
+        payment_qs = Payment.objects.filter(order=self).filter(status='N')
+
+        if not payment_qs.exists() and create is True:
+            payment = Payment(user=self.user, amount=self.amount, order=self)
+            payment.save()
+        else:
+            payment = payment_qs.first()
+
+        return payment
 
 
 class OrderItem(models.Model):
@@ -189,11 +213,33 @@ class Address(models.Model):
         verbose_name_plural = 'Addresses'
 
 
+PAYMENT_STATUS = (
+    ('N', 'New, waiting for payment'),
+    ('P', 'Paid'),
+    ('F', 'Payment failed'),
+)
+
+
+class PaymentType(models.Model):
+    name = models.CharField(max_length=256, blank=True, null=True)
+    payment_link = models.CharField(max_length=256, default="")
+    payment_instructions = models.TextField(default="")
+
+    def __str__(self):
+        return "{} [{}...] {}...".format(self.name, self.payment_link[:30], self.payment_instructions[:60])
+
+
 class Payment(models.Model):
     stripe_charge_id = models.CharField(max_length=50)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.SET_NULL, blank=True, null=True)
     amount = models.FloatField()
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="payments", related_query_name="orderpayment", null=True)
+    payment_type = models.ForeignKey(
+        PaymentType, on_delete=models.CASCADE, blank=True, null=True)
+    status = models.CharField(
+        max_length=1, choices=PAYMENT_STATUS, default='N')
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

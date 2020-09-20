@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 
-from .models import Item, Order, UserProfile, Coupon, Address, OrderItem, Category, Label
+from .models import Item, Order, UserProfile, Coupon, Address, OrderItem, Category, Label, PaymentType, Payment
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -59,17 +59,35 @@ class AddressSerializer(serializers.ModelSerializer):
                   'apartment_address', 'zip', 'address_type', 'default')
 
 
+class PaymentTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PaymentType
+        fields = ('id', 'name', 'payment_instructions', 'payment_link')
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+
+    payment_type = PaymentTypeSerializer(many=False)
+
+    class Meta:
+        model = Payment
+        fields = ('id', 'user', 'stripe_charge_id', 'amount',
+                  'order', 'payment_type', 'status', 'timestamp')
+
+
 class OrderSerializer(serializers.ModelSerializer):
     # plates = PlateSerializer(many=True, read_only=True)
     items = OrderItemSerializer(many=True)
     shipping_address = AddressSerializer()
     billing_address = AddressSerializer()
     user = serializers.StringRelatedField()
+    payments = PaymentSerializer(many=True)
 
     class Meta:
         model = Order
-        fields = ('id', 'user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'shipping_address',
-                  'billing_address', 'payment', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
+        fields = ('id', 'user', 'ref_code', 'items', 'start_date', 'ordered_date', 'ordered', 'payments', 'cancelled', 'shipping_address',
+                  'billing_address', 'coupon', 'being_delivered', 'received', 'refund_requested', 'refund_granted')
 
 
 class CouponSerializer(serializers.ModelSerializer):
@@ -84,10 +102,11 @@ class UserSerializer(serializers.ModelSerializer):
     profile = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
     # serializers.StringRelatedField(many=True)
     addresses = AddressSerializer(many=True)
+    orders = OrderSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile', 'addresses']
+        fields = ['id', 'username', 'profile', 'addresses', 'orders']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
