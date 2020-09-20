@@ -698,6 +698,39 @@ def choose_order_shipment(request):
 
 
 @api_view(['POST'])
+@schema(AutoSchema)
+def choose_order_billing_address(request):
+
+    # Get the request data and extract the values
+    print("Post request data: {}".format(request.data))
+    username = request.data['username']
+    address_id = request.data['address_id']
+    print("Username : {}, address id {}".format(username, address_id))
+
+    user = UserProfile.objects.filter(user__username=username).first()
+    billing = Address.objects.filter(id=address_id).first()
+
+    if user is not None and billing is not None:
+        current_order = user.get_current_order(create=True)
+        print("Got current order : {}".format(current_order))
+        print("Billing address: {}".format(billing))
+
+        current_order.billing_address = billing
+        current_order.save()
+        return Response({"message": "Billing address updated"})
+
+        # if request.method == 'POST':
+        #     return Response({"message": "Got some data!", "data": request.data})
+        # return Response({"message": "Hello, world!"})
+    elif user is None:
+        return Response({"message": "Cannot find user with username {}".format(username)})
+    elif billing is None:
+        return Response({"message": "Cannot find billing with id {}".format(address_id)})
+    else:
+        return Response({"message": "Unknwon error"})
+
+
+@api_view(['POST'])
 def cancel_order(request, id):
     print('Getting the order with the ID {}'.format(id))
 

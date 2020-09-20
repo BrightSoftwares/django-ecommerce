@@ -10,7 +10,7 @@ from django.utils import timezone
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, related_name='profile', on_delete=models.CASCADE)
+        settings.AUTH_USER_MODEL, related_name='userprofile', on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=50, blank=True, null=True)
     one_click_purchasing = models.BooleanField(default=False)
 

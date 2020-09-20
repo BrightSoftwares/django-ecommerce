@@ -29,7 +29,8 @@ from .views import (
     choose_order_shipment,
     cancel_order,
     get_userprofile_current_order,
-    choose_order_paymentmethod
+    choose_order_paymentmethod,
+    choose_order_billing_address
 )
 
 app_name = 'core'
@@ -61,21 +62,14 @@ urlpatterns = [
     path('bot/', handle_bot_queries, name='bot'),
     path('api/', include(router.urls), name='apiindex'),
     path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
-    #     path('api/orders/', OrderView, name='orders'),
     path('api/orders/<id>/cancel/', cancel_order, name='orders'),
-    #     path('api/items/', ItemView, name='items'),
-    #     path('api/address/', AddressView, name='address'),
-    #     path('api/coupon/', CouponView, name='coupon'),
-    #     path('api/category/', CategoryView, name='category'),
-    #     path('api/label/', LabelView, name='label'),
-    #     path('api/orderitem/', OrderItemView, name='orderitem'),
-    #     path('api/payment/', PaymentApiView, name='orderitem'),
-    #     path('api/userprofile/', UserProfileView, name='userprofile'),
     path('api/userprofile/<id>/current-order/',
          get_userprofile_current_order, name='userprofile-currentorder'),
     path('api/add-to-cart/<slug>/', add_to_cart, name='api-add-to-cart'),
-    path('api/choose-shipment/', choose_order_shipment,
-         name='api-choose-shipment'),
+    path('api/choose-shipping-address/', choose_order_shipment,
+         name='api-choose-shipping'),
+    path('api/choose-billing-address/', choose_order_billing_address,
+         name='api-choose-billing'),
     path('api/choose-payment-method/', choose_order_paymentmethod,
          name='api-choose-paymentmethod'),
     path('automation/update-from-vinted/',
