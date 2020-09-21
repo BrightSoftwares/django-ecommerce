@@ -30,7 +30,8 @@ from .views import (
     cancel_order,
     get_userprofile_current_order,
     choose_order_paymentmethod,
-    choose_order_billing_address
+    choose_order_billing_address,
+    get_me
 )
 
 app_name = 'core'
@@ -72,6 +73,8 @@ urlpatterns = [
          name='api-choose-billing'),
     path('api/choose-payment-method/', choose_order_paymentmethod,
          name='api-choose-paymentmethod'),
+    path('api/get-me/', get_me,
+         name='api-get-me'),
     path('automation/update-from-vinted/',
          update_from_vinted, name='update-from-vinted'),
 ]

@@ -786,3 +786,14 @@ def choose_order_paymentmethod(request):
         return Response({"message": "Cannot find payment method with id {}".format(payment_method_id)})
     else:
         return Response({"message": "Unknwon error"})
+
+
+@api_view(['POST'])
+@schema(AutoSchema)
+def get_me(request):
+    print("Getting currently connected user {}".format(request.user))
+    user = get_object_or_404(UserProfile, user=request.user)
+
+    serializer = UserProfileSerializer(user, many=False)
+
+    return JsonResponse(serializer.data, status=200)
