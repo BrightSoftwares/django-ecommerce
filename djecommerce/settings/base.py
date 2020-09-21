@@ -29,12 +29,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
 
+    'corsheaders',
+
     # 'djcelery'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -111,3 +114,10 @@ VINTED_LOGIN = config('VINTED_LOGIN')
 VINTED_PASSWORD = config('VINTED_PASSWORD')
 
 # djcelery.setup_loader()
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4000",
+    "http://0.0.0.0:4000",
+    "http://127.0.0.1:4000",
+    "https://whatsappecommerce.herokuapp.com"
+]
