@@ -100,7 +100,7 @@ docker-debug: ## Run the application in a docker container in debug mode
 	docker run -it --rm -v ${PWD}:/app fullbright/python3.6.11-buster /bin/bash
 
 docker-build: ## Build the application in a docker container
-	docker build -t fullbright/replay-downloader .
+	docker build -t fullbright/python3.6.11-buster -f Dockerfile.python3.6.11-buster .
 
 docker-run: ## Run the application in a docker container
 	docker run -it --env SLEEP_DURATION=30 -v $(MEDIAPATH):/home/fullbright/fr-replay-downloader/youtube -v $(LOGSPATH):/home/fullbright/fr-replay-downloader/logs fullbright/replay-downloader
