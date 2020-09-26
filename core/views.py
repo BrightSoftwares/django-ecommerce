@@ -16,7 +16,7 @@ from core import controller
 
 from django_twilio.decorators import twilio_view
 
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.schemas import AutoSchema
@@ -662,6 +662,13 @@ class ChooseShipmentView(APIView):
         print("query set", self.queryset)
         usernames = [user.user.username for user in UserProfile.objects.all()]
         return Response(usernames)
+
+
+class LogoutView(APIView):
+    def get(self, request, format=None):
+        # simply delete the token to force a login
+        request.user.auth_token.delete()
+        return JsonResponse({"message": "Logout successful."}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

@@ -31,7 +31,8 @@ from .views import (
     get_userprofile_current_order,
     choose_order_paymentmethod,
     choose_order_billing_address,
-    get_me
+    get_me,
+    LogoutView
 )
 
 app_name = 'core'
@@ -63,6 +64,7 @@ urlpatterns = [
     path('bot/', handle_bot_queries, name='bot'),
     path('api/', include(router.urls), name='apiindex'),
     path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
+    path('api-logout/', LogoutView.as_view(), name="api-logout"),
     path('api/orders/<id>/cancel/', cancel_order, name='orders'),
     path('api/userprofile/<id>/current-order/',
          get_userprofile_current_order, name='userprofile-currentorder'),
