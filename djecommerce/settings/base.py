@@ -8,6 +8,7 @@ BASE_DIR = os.path.dirname(
             os.path.abspath(__file__))))
 
 SECRET_KEY = config('SECRET_KEY')
+CORS_HOST = config('CORS_HOST')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -116,7 +117,7 @@ VINTED_PASSWORD = config('VINTED_PASSWORD')
 # djcelery.setup_loader()
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4000",
+    CORS_HOST,
     "http://0.0.0.0:4000",
     "http://127.0.0.1:4000",
     "https://whatsappecommerce.herokuapp.com"
