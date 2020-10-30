@@ -430,10 +430,7 @@ class ItemDetailView(DetailView):
     template_name = "product.html"
 
 
-@login_required
-@permission_classes((IsAuthenticated,))
-def add_to_cart(request, slug):
-    item = get_object_or_404(Item, slug=slug)
+def handle_add_to_cart(request, item):
     order_item, created = OrderItem.objects.get_or_create(
         item=item,
         user=request.user,
@@ -446,18 +443,29 @@ def add_to_cart(request, slug):
         if order.items.filter(item__slug=item.slug).exists():
             order_item.quantity += 1
             order_item.save()
-            messages.info(request, "This item quantity was updated.")
-            return redirect("core:order-summary")
+            return False  # Only the quantity was updated.
         else:
             order.items.add(order_item)
-            messages.info(request, "This item was added to your cart.")
-            return redirect("core:order-summary")
+            return True  # The item was added
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(
             user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
+        return True  # The item was added
+
+
+@login_required
+@permission_classes((IsAuthenticated,))
+def add_to_cart(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    added = handle_add_to_cart(request.user, item)
+
+    if added is True:  # For more clarity
         messages.info(request, "This item was added to your cart.")
+        return redirect("core:order-summary")
+    else:
+        messages.info(request, "This item quantity was updated.")
         return redirect("core:order-summary")
 
 
@@ -804,3 +812,16 @@ def get_me(request):
     serializer = UserProfileSerializer(user, many=False)
 
     return JsonResponse(serializer.data, status=200)
+
+
+@api_view(['POST'])
+@schema(AutoSchema)
+@permission_classes((IsAuthenticated,))
+def add_to_cart_byid(request, id):
+    item = get_object_or_404(Item, id=id)
+    added = handle_add_to_cart(request.user, item)
+
+    if added is True:
+        return Response({"message": "Product added"})
+    else:
+        return Response({"message": "Product quantity updated"})
