@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from rest_framework.authtoken import views
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
     ItemDetailView,
@@ -32,6 +33,7 @@ from .views import (
     choose_order_paymentmethod,
     choose_order_billing_address,
     get_me,
+    add_to_cart_byid,
     LogoutView
 )
 
@@ -63,12 +65,17 @@ urlpatterns = [
     path('request-refund/', RequestRefundView.as_view(), name='request-refund'),
     path('bot/', handle_bot_queries, name='bot'),
     path('api/', include(router.urls), name='apiindex'),
-    path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
+    #     path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
+    path('api-token-auth/', TokenObtainPairView.as_view(), name='api-token-auth'),
+    path('api-token-auth/refresh/',
+         TokenRefreshView.as_view(), name='api-token-auth'),
     path('api-logout/', LogoutView.as_view(), name="api-logout"),
     path('api/orders/<id>/cancel/', cancel_order, name='orders'),
     path('api/userprofile/<id>/current-order/',
          get_userprofile_current_order, name='userprofile-currentorder'),
     path('api/add-to-cart/<slug>/', add_to_cart, name='api-add-to-cart'),
+    path('api/add-to-cart-byid/<id>/',
+         add_to_cart_byid, name='api-add-to-cart-byid'),
     path('api/choose-shipping-address/', choose_order_shipment,
          name='api-choose-shipping'),
     path('api/choose-billing-address/', choose_order_billing_address,

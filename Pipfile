@@ -57,6 +57,7 @@ Django = "*"
 Pillow = "*"
 PyJWT = "*"
 django-cors-headers = "*"
+djangorestframework-simplejwt = "*"
 
 [requires]
 python_version = "3.6"
