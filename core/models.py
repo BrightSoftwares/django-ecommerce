@@ -68,8 +68,10 @@ class Item(models.Model):
         Label, on_delete=models.CASCADE, blank=False, null=False)
     slug = models.SlugField()
     description = models.TextField()
-    image = models.ImageField()
+    image = models.ImageField(default='default.jpg')
     stock_quantity = models.IntegerField(default=1)
+    external_image = models.URLField(default="")
+    external_product_id = models.CharField(max_length=256)
 
     def __str__(self):
         return "{} {}€ {}".format(self.title, self.price, self.label)
