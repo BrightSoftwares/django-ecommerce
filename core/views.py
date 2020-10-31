@@ -559,30 +559,52 @@ def update_from_vinted(request):
     for product in vinted_data_json['items']:
         product_id = product['id']
         html_response += "<p>Processing product id {}</p>".format(product_id)
+        my_brand = product['brand']
 
         print("Processing product id {}".format(product_id))
         # Get or create the category
-        category, createdcategory = Category.objects.get_or_create(
-            name=product['brand'])
+        # (category, createdcategory) = Category.objects.get_or_create(name=my_brand)
+        category = Category.objects.filter(name=my_brand).first()
+        if category is None:
+            category = Category(name=my_brand)
+            category.save()
 
         # Get or create the label
         label, createdlabel = Label.objects.get_or_create(name="vinted")
 
-        # Update the products
-        item, created = Item.objects.get_or_create(
-            title=product['title'],
-            price=product['original_price_numeric'],
-            discount_price=product['price_numeric'],
-            category=category,
-            label=label,
-            slug=slugify("{}{}".format(product['title'][:200], product['id'])),
-            description=product['description']
-        )
+        myslug = slugify("{}{}".format(product['title'][:200], product['id']))
+        mydescription = product['description']
+        my_external_image = product['photos'][0]['url']
+        my_title = product['title']
+        my_price = product['original_price_numeric']
+        my_discounted_price = product['price_numeric']
 
-        item.description = product['description'],
+        # Update the products
+        item = Item.objects.filter(external_product_id=product_id).first()
+
+        if item is None:
+            item = Item()
+        # item, created = Item.objects.get_or_create(
+        #     title=product['title'],
+        #     price=product['original_price_numeric'],
+        #     discount_price=product['price_numeric'],
+        #     category=category,
+        #     label=label,
+        #     slug=myslug,
+        #     description=mydescription
+        # )
+
+        item.title = my_title
+        item.price = my_price
+        item.discount_price = my_discounted_price
+        item.category = category
+        item.label = label
+        item.slug = myslug
+        item.description = mydescription
+
         # external_image=product['photos'][0]['thumbnails'][0]['url'],
-        item.external_image = product['photos'][0]['url'],
-        item.external_product_id = product['id'],
+        item.external_image = my_external_image
+        item.external_product_id = product['id']
         item.stock_quantity = 1
 
         item.save()
