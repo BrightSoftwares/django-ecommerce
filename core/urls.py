@@ -86,4 +86,5 @@ urlpatterns = [
          name='api-get-me'),
     path('automation/update-from-vinted/',
          update_from_vinted, name='update-from-vinted'),
+
 ]

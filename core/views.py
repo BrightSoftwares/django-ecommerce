@@ -9,6 +9,7 @@ from django.views.generic import ListView, DetailView, View
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.text import slugify
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm
 from .models import Item, OrderItem, Order, Address, Payment, PaymentType, Coupon, Refund, UserProfile, Category, Label
 from twilio.twiml.messaging_response import MessagingResponse, Media, Message, Body
@@ -32,6 +33,7 @@ from core.tasks import pull_vinted_products
 
 import random
 import string
+import json
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -64,7 +66,7 @@ Customer journey :
     -> Get the link where to pay OK
     -> Pay TODO
 
--> View order / -> View cart OK 
+-> View order / -> View cart OK
     -> Return only the non paid order (see view order status) OK
     -> Return only the order that belong to the user with the ID specified OK
     -> OrderItems :
@@ -537,9 +539,53 @@ def get_coupon(request, code):
         return redirect("core:checkout")
 
 
+@api_view(['POST'])
+@schema(AutoSchema)
 def update_from_vinted(request):
-    pull_vinted_products.delay()
-    return HttpResponse("<h1>Task added {}</h1>".format(timezone.now()))
+    # Create a celery task to update the products
+    # pull_vinted_products.delay()
+    # return HttpResponse("<h1>Task added {}</h1>".format(timezone.now()))
+
+    # Get the request body
+    print("Post request data: {}".format(request.data))
+    vinted_data = request.data['vinted_data']
+    print("vinted_data : {}".format(vinted_data))
+    html_response = "<h2>Product updates</h2>"
+
+    # Read the json data
+    # vinted_data_json = json.load(vinted_data)
+    vinted_data_json = vinted_data
+
+    for product in vinted_data_json['items']:
+        product_id = product['id']
+        html_response += "<p>Processing product id {}</p>".format(product_id)
+
+        print("Processing product id {}".format(product_id))
+        # Get or create the category
+        category, createdcategory = Category.objects.get_or_create(
+            name=product['brand'])
+
+        # Get or create the label
+        label, createdlabel = Label.objects.get_or_create(name="vinted")
+
+        # Update the products
+        item, created = Item.objects.get_or_create(
+            title=product['title'],
+            price=product['original_price_numeric'],
+            discount_price=product['price_numeric'],
+            category=category,
+            label=label,
+            slug=slugify("{}{}".format(product['title'], product['id'])),
+            description=product['description'],
+            external_image=product['photos'][0]['thumbnails'][0]['url'],
+            external_product_id=product['id'],
+            stock_quantity=1
+        )
+        item.save()
+        print("Done for product id {}".format(product_id))
+
+    html_response += "<h2>Task finished at {}</h2>".format(timezone.now())
+    return HttpResponse(html_response)
 
 
 class AddCouponView(View):
