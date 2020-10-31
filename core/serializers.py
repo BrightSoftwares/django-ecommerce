@@ -26,7 +26,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ('id', 'title', 'price', 'discount_price', 'category',
-                  'label', 'slug', 'description', 'image')
+                  'label', 'slug', 'description', 'image', 'external_image', 'external_product_id')
 
     def create(self, validated_data):
         category_data = validated_data.pop('category')
@@ -36,10 +36,10 @@ class ItemSerializer(serializers.ModelSerializer):
         category, _ = Category.objects.get_or_create(**category_data)
         label, _ = Label.objects.get_or_create(**label_data)
 
-        album = Item.objects.create(
+        item = Item.objects.create(
             **validated_data, category=category, label=label)
 
-        return album
+        return item
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
