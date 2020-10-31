@@ -575,12 +575,16 @@ def update_from_vinted(request):
             discount_price=product['price_numeric'],
             category=category,
             label=label,
-            slug=slugify("{}{}".format(product['title'], product['id'])),
-            description=product['description'],
-            external_image=product['photos'][0]['thumbnails'][0]['url'],
-            external_product_id=product['id'],
-            stock_quantity=1
+            slug=slugify("{}{}".format(product['title'][:200], product['id'])),
+            description=product['description']
         )
+
+        item.description = product['description'],
+        # external_image=product['photos'][0]['thumbnails'][0]['url'],
+        item.external_image = product['photos'][0]['url'],
+        item.external_product_id = product['id'],
+        item.stock_quantity = 1
+
         item.save()
         print("Done for product id {}".format(product_id))
 
