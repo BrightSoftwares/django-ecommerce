@@ -563,11 +563,12 @@ def update_from_vinted(request):
 
         print("Processing product id {}".format(product_id))
         # Get or create the category
-        # (category, createdcategory) = Category.objects.get_or_create(name=my_brand)
-        category = Category.objects.filter(name=my_brand).first()
-        if category is None:
-            category = Category(name=my_brand)
-            category.save()
+        category, createdcategory = Category.objects.get_or_create(
+            name=my_brand)
+        # category = Category.objects.filter(name=my_brand).first()
+        # if category is None:
+        #     category = Category(name=my_brand)
+        #     category.save()
 
         # Get or create the label
         label, createdlabel = Label.objects.get_or_create(name="vinted")
@@ -581,18 +582,8 @@ def update_from_vinted(request):
 
         # Update the products
         item = Item.objects.filter(external_product_id=product_id).first()
-
         if item is None:
             item = Item()
-        # item, created = Item.objects.get_or_create(
-        #     title=product['title'],
-        #     price=product['original_price_numeric'],
-        #     discount_price=product['price_numeric'],
-        #     category=category,
-        #     label=label,
-        #     slug=myslug,
-        #     description=mydescription
-        # )
 
         item.title = my_title
         item.price = my_price
