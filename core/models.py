@@ -66,7 +66,7 @@ class Item(models.Model):
     # label = models.CharField(choices=LABEL_CHOICES, max_length=1)
     label = models.ForeignKey(
         Label, on_delete=models.CASCADE, blank=False, null=False)
-    slug = models.SlugField()
+    slug = models.SlugField(max_length=256)
     description = models.TextField()
     image = models.ImageField(default='default.jpg')
     stock_quantity = models.IntegerField(default=1)
