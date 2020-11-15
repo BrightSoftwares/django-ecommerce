@@ -564,14 +564,14 @@ def update_from_vinted(request):
         print("Processing product id {}".format(product_id))
         # Get or create the category
         category, createdcategory = Category.objects.get_or_create(
-            name=my_brand)
+            name="Vetements")
         # category = Category.objects.filter(name=my_brand).first()
         # if category is None:
         #     category = Category(name=my_brand)
         #     category.save()
 
         # Get or create the label
-        label, createdlabel = Label.objects.get_or_create(name="vinted")
+        label, createdlabel = Label.objects.get_or_create(name=my_brand)
 
         myslug = slugify("{}{}".format(product['title'][:200], product['id']))
         mydescription = product['description']
