@@ -1,5 +1,7 @@
 FROM python:3.6.11-buster
-MAINTAINER Full Bright <full3right@gmail.com>
+LABEL maintainer="Full Bright <full3right@gmail.com>"
+
+RUN apt-get update && apt-get install gettext -y
 
 WORKDIR /app/
 COPY Pipfile /app/
